@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#3498db">
+    <title>Abend-Aktivator</title>
+    <style>
+        :root {
+            --bg-color: #f0f4f8;
+            --card-bg: #ffffff;
+            --primary: #3498db;
+            --secondary: #2c3e50;
+            --accent: #e67e22;
+            --text: #333;
+        }
+
+        body { 
+            font-family: 'Roboto', sans-serif; 
+            background-color: var(--bg-color); 
+            color: var(--text); 
+            margin: 0; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            height: 100vh;
+            overflow: hidden;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .container { 
+            background: var(--card-bg); 
+            padding: 30px; 
+            border-radius: 25px; 
+            box-shadow: 0 15px 35px rgba(0,0,0,0.1); 
+            width: 85%; 
+            max-width: 450px; 
+            text-align: center; 
+        }
+
+        h1 { color: var(--secondary); font-size: 1.6em; margin-bottom: 25px; }
+
+        #aktivitaet-anzeige { 
+            border: 2px solid #e0e6ed; 
+            border-radius: 20px; 
+            padding: 25px; 
+            margin-bottom: 30px; 
+            min-height: 200px; 
+            display: flex; 
+            flex-direction: column; 
+            justify-content: center; 
+            background: #fafbfc; 
+        }
+
+        .aktivitaet-name { 
+            font-size: 1.8em; 
+            font-weight: bold; 
+            color: var(--primary); 
+            margin-bottom: 12px; 
+        }
+
+        .aktivitaet-info { 
+            font-size: 1.05em; 
+            color: #666; 
+            line-height: 1.4;
+        }
+
+        .button-primary { 
+            background-color: var(--primary); 
+            color: white; 
+            border: none; 
+            width: 100%;
+            padding: 20px; 
+            font-size: 1.2em; 
+            font-weight: bold;
+            border-radius: 15px; 
+            cursor: pointer; 
+            box-shadow: 0 6px 15px rgba(52, 152, 219, 0.3);
+            transition: transform 0.1s;
+        }
+
+        .button-primary:active {
+            transform: scale(0.95);
+        }
+
+        #monitor-hinweis { 
+            margin-top: 25px; 
+            font-size: 0.85em; 
+            color: var(--accent); 
+            font-weight: 500;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Feierabend-Fokus</h1>
+    
+    <div id="aktivitaet-anzeige">
+        <div id="platzhalter-text" style="color: #999; font-style: italic;">Bereit für einen klaren Kopf?</div>
+        <div id="ergebnis-bereich" style="display: none;">
+            <div id="aktivitaet-name" class="aktivitaet-name"></div>
+            <div id="aktivitaet-info" class="aktivitaet-info"></div>
+        </div>
+    </div>
+
+    <button class="button-primary" onclick="waehleAktivitaet()">Vorschlag erhalten</button>
+    
+    <p id="monitor-hinweis">🖥️ Jede Minute Fokus bringt dich dem 37" Monitor näher.</p>
+</div>
+
+<script>
+    const aktivitaeten = [
+        { name: "Sport", info: "Kurze Runde joggen. Nur 15-20 Minuten, um den Stress physisch auszuschwitzen und das Gehirn mit Sauerstoff zu fluten." },
+        { name: "Korb flechten", info: "Hände beschäftigen, Kopf ausschalten. Die haptische Arbeit wirkt wie ein mechanischer Anker gegen das Grübeln." },
+        { name: "Zeichnen lernen", info: "Konzentrier dich auf Linien und Schatten. Das aktiviert deine kreative Gehirnhälfte und beruhigt das Gedankenkarussell." },
+        { name: "Kurs-Fortschritt", info: "30 Minuten neues Wissen. Strukturierte Information hilft deinem Kopf, sich von diffusem Alltagsstress zu lösen." },
+        { name: "Serie schauen", info: "Bewusst eine Folge genießen. Handy weg, damit dein Belohnungssystem mal eine Pause vom Dauerfeuer bekommt." },
+        { name: "Musik-Session", info: "Ein komplettes Album hören. Augen zu und nur auf die Instrumente achten. Musik ordnet die Emotionen." },
+        { name: "Lesen", info: "In eine andere Welt abtauchen. Worte statt Bildschirme geben deinem Geist den nötigen Tiefgang zum Abschalten." },
+        { name: "Gezielte Dehnung", info: "10 Minuten Stretching. Spür die körperliche Freiheit, wenn die Anspannung des Tages aus den Muskeln weicht." },
+        { name: "Podcast / ByteFM", info: "Ohren auf, Augen zu. Lass dich von Musik oder Wissen berieseln, während deine Sehnerven sich vom Monitor erholen." },
+        { name: "Neues Rezept kochen", info: "Fokus auf Schneiden, Wiegen und Abschmecken. Handwerkliches Erschaffen macht zufrieden und lenkt perfekt ab." }
+    ];
+
+    let letzteAktivitaet = null;
+
+    function waehleAktivitaet() {
+        const platzhalter = document.getElementById('platzhalter-text');
+        const ergebnisBereich = document.getElementById('ergebnis-bereich');
+        const nameAnzeige = document.getElementById('aktivitaet-name');
+        const infoAnzeige = document.getElementById('aktivitaet-info');
+
+        let neueAktivitaet;
+        // Zufallswahl ohne Wiederholung der letzten Aktivität
+        do {
+            const index = Math.floor(Math.random() * aktivitaeten.length);
+            neueAktivitaet = aktivitaeten[index];
+        } while (neueAktivitaet === letzteAktivitaet);
+
+        letzteAktivitaet = neueAktivitaet;
+
+        // Anzeige aktualisieren
+        platzhalter.style.display = 'none';
+        ergebnisBereich.style.display = 'block';
+        
+        nameAnzeige.innerText = neueAktivitaet.name;
+        infoAnzeige.innerText = neueAktivitaet.info;
+        
+        // Haptisches Feedback für Android
+        if (navigator.vibrate) { 
+            navigator.vibrate(40); 
+        }
+    }
+</script>
+
+</body>
+</html>
